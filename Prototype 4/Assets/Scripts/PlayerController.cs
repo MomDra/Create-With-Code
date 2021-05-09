@@ -6,6 +6,8 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField]
     float speed = 5;
+    bool hasPowerup = false;
+    float powerupStrength = 15;
 
     GameObject focalPoint;
     Rigidbody playerRb;
@@ -22,5 +24,33 @@ public class PlayerController : MonoBehaviour
     {
         float forwardInput = Input.GetAxis("Vertical");
         playerRb.AddForce(focalPoint.transform.forward * speed * forwardInput);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Powerup"))
+        {
+            hasPowerup = true;
+            Destroy(other.gameObject);
+            StartCoroutine(PowerupCountdownRoutine());
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.gameObject.CompareTag("Enemy") && hasPowerup)
+        {
+            Rigidbody enemyRb = collision.gameObject.GetComponent<Rigidbody>();
+            Vector3 awayFromPlayer = (collision.gameObject.transform.position - transform.position);
+            enemyRb.AddForce(awayFromPlayer * powerupStrength, ForceMode.Impulse);
+
+            Debug.Log("Collied with" + collision.gameObject.name + " with powerup set to" + hasPowerup);
+        }
+    }
+
+    IEnumerator PowerupCountdownRoutine()
+    {
+        yield return new WaitForSeconds(7);
+        hasPowerup = false;
     }
 }
