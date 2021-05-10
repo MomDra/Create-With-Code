@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    float speed = 10;
+    float speed = 100;
     float zBound = 5.5f;
     Rigidbody playerRb;
 
@@ -40,6 +40,22 @@ public class PlayerController : MonoBehaviour
         else if (transform.position.z < -zBound)
         {
             transform.position = new Vector3(transform.position.x, transform.position.y, -zBound);
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            Debug.Log("Player has collied with enemey.");
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Powerup"))
+        {
+            Destroy(other.gameObject);
         }
     }
 }
