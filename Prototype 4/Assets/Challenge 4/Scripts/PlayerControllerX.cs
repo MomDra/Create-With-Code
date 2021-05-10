@@ -14,10 +14,6 @@ public class PlayerControllerX : MonoBehaviour
 
     private float normalStrength = 10; // how hard to hit enemy without powerup
     private float powerupStrength = 25; // how hard to hit enemy with powerup
-
-    [SerializeField]
-    ParticleSystem smokeParticle;
-    bool canBoost = true;
     
     void Start()
     {
@@ -27,23 +23,13 @@ public class PlayerControllerX : MonoBehaviour
 
     void Update()
     {
-        float boost = 5;
         // Add force to player in direction of the focal point (and camera)
         float verticalInput = Input.GetAxis("Vertical");
-        if (Input.GetKeyDown(KeyCode.Space) && canBoost)
-        {
-            canBoost = false;
-            playerRb.AddForce(focalPoint.transform.forward * verticalInput * speed * Time.deltaTime * boost, ForceMode.Impulse);
-            smokeParticle.Play();
-            StartCoroutine(BoostCooldown());
-        }
-            
-
         playerRb.AddForce(focalPoint.transform.forward * verticalInput * speed * Time.deltaTime); 
 
         // Set powerup indicator position to beneath player
         powerupIndicator.transform.position = transform.position + new Vector3(0, -0.6f, 0);
-        smokeParticle.transform.position = transform.position + new Vector3(0, -0.6f, 0);
+
     }
 
     // If Player collides with powerup, activate powerup
@@ -54,7 +40,6 @@ public class PlayerControllerX : MonoBehaviour
             Destroy(other.gameObject);
             hasPowerup = true;
             powerupIndicator.SetActive(true);
-            StartCoroutine(PowerupCooldown());
         }
     }
 
@@ -66,19 +51,13 @@ public class PlayerControllerX : MonoBehaviour
         powerupIndicator.SetActive(false);
     }
 
-    IEnumerator BoostCooldown()
-    {
-        yield return new WaitForSeconds(3);
-        canBoost = true;
-    }
-
     // If Player collides with enemy
     private void OnCollisionEnter(Collision other)
     {
         if (other.gameObject.CompareTag("Enemy"))
         {
             Rigidbody enemyRigidbody = other.gameObject.GetComponent<Rigidbody>();
-            Vector3 awayFromPlayer = other.gameObject.transform.position - transform.position;
+            Vector3 awayFromPlayer =  transform.position - other.gameObject.transform.position; 
            
             if (hasPowerup) // if have powerup hit enemy with powerup force
             {
