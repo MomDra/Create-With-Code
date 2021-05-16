@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -31,6 +32,14 @@ public class PlayerController : MonoBehaviour
         playerRb.centerOfMass = centerOfMass.transform.position;
     }
 
+    private void Update()
+    {
+        if(transform.position.y < -30)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+    }
+
     // Update is called once per frame
     void FixedUpdate()
     {
@@ -48,6 +57,11 @@ public class PlayerController : MonoBehaviour
             speedometerText.SetText("Speed: " + speed + "km/h");
             rpm = (speed % 30) * 40;
             rpmText.SetText("RPM: " + rpm);
+        }
+
+        if(IsOnGround() && playerRb.velocity.magnitude*3.6f < 1)
+        {
+            playerRb.AddRelativeForce(Vector3.forward * horsePower * vertialInput * 10);
         }
     }
 
